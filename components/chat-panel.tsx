@@ -36,24 +36,24 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'What are the',
-      subheading: 'trending memecoins today?',
-      message: `What are the trending memecoins today?`
+      heading: 'Provide an interactive',
+      subheading: 'activity to teach self-management.',
+      message: 'Provide an interactive activity to teach self-management.'
     },
     {
-      heading: 'What is the price of',
-      subheading: '$DOGE right now?',
-      message: 'What is the price of $DOGE right now?'
+      heading: 'What are the 5',
+      subheading: 'main components of SEL?',
+      message: 'What are the 5 main components of SEL?'
     },
     {
-      heading: 'I would like to buy',
-      subheading: '42 $DOGE',
-      message: `I would like to buy 42 $DOGE`
+      heading: 'What RCTs',
+      subheading: 'have been done on SEL?',
+      message: 'What RCTs have been done on SEL?'
     },
     {
-      heading: 'What are some',
-      subheading: `recent events about $DOGE?`,
-      message: `What are some recent events about $DOGE?`
+      heading: 'Provide tips',
+      subheading: 'for fostering SEL in a Zoom classroom.',
+      message: 'Provide tips for fostering SEL in a Zoom classroom.'
     }
   ]
 

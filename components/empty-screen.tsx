@@ -1,36 +1,25 @@
-import { UseChatHelpers } from 'ai/react'
-
-import { Button } from '@/components/ui/button'
 import { ExternalLink } from '@/components/external-link'
-import { IconArrowRight } from '@/components/ui/icons'
 
 export function EmptyScreen() {
   return (
     <div className="mx-auto max-w-2xl px-4">
       <div className="flex flex-col gap-2 rounded-lg border bg-background p-8">
-        <h1 className="text-lg font-semibold">
-          Welcome to Next.js AI Chatbot!
-        </h1>
+        <h1 className="text-lg font-semibold">Welcome to SEL Chatbot!</h1>
         <p className="leading-normal text-muted-foreground">
-          This is an open source AI chatbot app template built with{' '}
-          <ExternalLink href="https://nextjs.org">Next.js</ExternalLink>, the{' '}
-          <ExternalLink href="https://sdk.vercel.ai">
-            Vercel AI SDK
-          </ExternalLink>
-          , and{' '}
-          <ExternalLink href="https://vercel.com/storage/kv">
-            Vercel KV
-          </ExternalLink>
-          .
+          SEL Chatbot is designed to support{' '}
+          <ExternalLink href="https://en.wikipedia.org/wiki/Social–emotional_learning">
+            social and emotional learning
+          </ExternalLink>{' '}
+          by offering interactive activities, resources, and guidance for{' '}
+          students, teachers, and researchers to learn about SEL.
         </p>
         <p className="leading-normal text-muted-foreground">
-          It uses{' '}
-          <ExternalLink href="https://vercel.com/blog/ai-sdk-3-generative-ui">
-            React Server Components
+          Students participating in SEL at school have higher levels of{' '}
+          <ExternalLink href="https://osf.io/mk35u">
+            “school functioning,”
           </ExternalLink>{' '}
-          to combine text with generative UI as output of the LLM. The UI state
-          is synced through the SDK so the model is aware of your interactions
-          as they happen.
+          as reflected by their grades, test scores, attendance, and homework
+          completion.
         </p>
       </div>
     </div>

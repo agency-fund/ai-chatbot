@@ -35,6 +35,7 @@ import { saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
+import { ISpyGame } from '@/components/activities/i-spy-game'
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
   'use server'
@@ -127,23 +128,25 @@ async function submitUserMessage(content: string) {
   let textNode: undefined | React.ReactNode
 
   const result = await streamUI({
-    model: openai('gpt-3.5-turbo'),
+    model: openai('gpt-4o'),
     initial: <SpinnerMessage />,
     system: `\
-    You are a stock trading conversation bot and you can help users buy stocks, step by step.
-    You and the user can discuss stock prices and the user can adjust the amount of stocks they want to buy, or place an order, in the UI.
-    
-    Messages inside [] means that it's a UI element or a user event. For example:
-    - "[Price of AAPL = 100]" means that an interface of the stock price of AAPL is shown to the user.
-    - "[User has changed the amount of AAPL to 10]" means that the user has changed the amount of AAPL to 10 in the UI.
-    
-    If the user requests purchasing a stock, call \`show_stock_purchase_ui\` to show the purchase UI.
-    If the user just wants the price, call \`show_stock_price\` to show the price.
-    If you want to show trending stocks, call \`list_stocks\`.
-    If you want to show events, call \`get_events\`.
-    If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
-    
-    Besides that, you can also chat with users and do some calculations if needed.`,
+    You are an SEL (Social and Emotional Learning) conversation bot designed to support students, teachers, and researchers in learning about SEL. You can help users engage in interactive activities, provide resources, and offer guidance on SEL topics.
+    Students participating in SEL at school have higher levels of "school functioning", as reflected by their grades, test scores, attendance, and homework completion.
+
+    Messages inside [] mean that it's a UI element or a user event. For example:
+    - "[SEL Activity: Mindfulness Exercise]" means that an interface of a mindfulness exercise activity is shown to the user.
+    - "[User has completed the empathy quiz]" means that the user has completed the empathy quiz in the UI.
+
+    If the user requests an activity to demonstrate the SEL concept of self-management, call \`start_ispy_game\` to start the self-management activity. Be sure to ask them what object they want to guess.
+
+    If the user requests an SEL activity, call \`show_sel_activity_ui\` to show the activity UI.
+    If the user wants SEL resources, call \`show_sel_resources\` to display the resources.
+    If you want to show SEL topics, call \`list_sel_topics\`.
+    If you want to show SEL events, call \`get_sel_events\`.
+    If the user requests something outside of SEL or an impossible task, respond that you are focused on SEL support and cannot do that.
+
+    Besides that, you can also chat with users and provide information or guidance on SEL topics if needed.`,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -177,6 +180,23 @@ async function submitUserMessage(content: string) {
       return textNode
     },
     tools: {
+      startISpyGame: {
+        description: 'Start the ispy game.',
+        parameters: z.object({
+          object: z.string().describe('The object to guess.')
+        }),
+        generate: async function* ({ object }) {
+          yield (
+            <BotCard>
+              <StockSkeleton />
+            </BotCard>
+          )
+
+          console.log({ object })
+
+          return <ISpyGame props={{ items: [object] }} />
+        }
+      },
       listStocks: {
         description: 'List three imaginary stocks that are trending.',
         parameters: z.object({
