@@ -1,5 +1,5 @@
 {
-  "name": "sel-chatbot-frontend",
+  "name": "web",
   "private": true,
   "scripts": {
     "dev": "next dev",
