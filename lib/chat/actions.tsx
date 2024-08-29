@@ -36,6 +36,7 @@ import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
 import { ISpyGame } from '@/components/activities/i-spy-game'
+import { ISpyGame2 } from '@/components/activities/i-spy-game-2'
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
   'use server'
@@ -131,14 +132,14 @@ async function submitUserMessage(content: string) {
     model: openai('gpt-4o'),
     initial: <SpinnerMessage />,
     system: `\
-    You are an SEL (Social and Emotional Learning) conversation bot designed to support students, teachers, and researchers in learning about SEL. You can help users engage in interactive activities, provide resources, and offer guidance on SEL topics.
+    You are an SEL (Social and Emotional Learning) conversation bot designed to support teachers, and researchers in learning about SEL so that they can support students in their learning. You can help users engage in interactive activities in a tutorial fashion so they can perform later, provide resources, and offer guidance on SEL topics.
     Students participating in SEL at school have higher levels of "school functioning", as reflected by their grades, test scores, attendance, and homework completion.
 
     Messages inside [] mean that it's a UI element or a user event. For example:
     - "[SEL Activity: Mindfulness Exercise]" means that an interface of a mindfulness exercise activity is shown to the user.
     - "[User has completed the empathy quiz]" means that the user has completed the empathy quiz in the UI.
 
-    If the user requests an activity to demonstrate the SEL concept of self-management, call \`start_ispy_game\` to start the self-management activity. Be sure to ask them what object they want to guess.
+    If the user requests an activity to demonstrate the SEL concept of self-management, call \`start_ispy_game\` to start the self-management activity. Be sure to ask them what objects they want the students to guess.
 
     If the user requests an SEL activity, call \`show_sel_activity_ui\` to show the activity UI.
     If the user wants SEL resources, call \`show_sel_resources\` to display the resources.
@@ -194,7 +195,7 @@ async function submitUserMessage(content: string) {
 
           console.log({ object })
 
-          return <ISpyGame props={{ items: [object] }} />
+          return <ISpyGame2 props={{ items: [object] }} />
         }
       },
       listStocks: {
