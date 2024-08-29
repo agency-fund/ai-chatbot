@@ -36,24 +36,24 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'Provide an interactive',
-      subheading: 'activity to teach self-management.',
-      message: 'Provide an interactive activity to teach self-management.'
+      heading: '',
+      subheading: 'What are some effective SEL activities in a classroom setting?',
+      message: 'What are some effective SEL activities in a classroom setting?'
     },
     {
-      heading: 'What are the 5',
-      subheading: 'main components of SEL?',
-      message: 'What are the 5 main components of SEL?'
+      heading: '',
+      subheading: 'How can we measure SEL development in children?',
+      message: 'How can we measure SEL development in children?'
     },
     {
-      heading: 'What RCTs',
-      subheading: 'have been done on SEL?',
-      message: 'What RCTs have been done on SEL?'
+      heading: '',
+      subheading: 'What guidelines exist for developing SEL tools in a new culture?',
+      message: 'What guidelines exist for developing SEL tools in a new culture?'
     },
     {
-      heading: 'Provide tips',
-      subheading: 'for fostering SEL in a Zoom classroom.',
-      message: 'Provide tips for fostering SEL in a Zoom classroom.'
+      heading: '',
+      subheading: 'Why are SEL programs important for child development?',
+      message: 'Why are SEL programs important for child development?'
     }
   ]
 
