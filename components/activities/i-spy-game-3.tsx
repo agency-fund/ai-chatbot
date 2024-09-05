@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useActions, useUIState } from 'ai/rsc'
 
 import { cn } from '@/lib/utils'
@@ -40,7 +41,7 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
         (image: string) => `http://localhost:8000/images/download/${image}`
       )
       setImages(imageUrls)
-      setGamePhase('play')
+      // setGamePhase('play')
       setCurrentItem(getRandomItem())
     } catch (error) {
       console.error('Failed to fetch images:', error)
@@ -68,24 +69,71 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
   }
 
   return (
-    <div className="rounded-xl border bg-zinc-950 p-4 text-green-400">
-      <div className="text-lg text-zinc-300">I Spy Game: Focus Power</div>
+    <div className="rounded-xl border border-[#547221] bg-[#B5D97A] p-4">
+      <div className="text-white uppercase font-black text-3xl">I Spy</div>
 
       {gamePhase === 'intro' && (
         <div className="mt-4">
-          <p>Let's practice our Focus Power with the I Spy game!</p>
+          <div className="-mx-2 bg-[#547221] text-white p-4 rounded-lg">
+            <p>
+              <span className="font-black">WHAT IS IT?</span> A game to build
+              executive function skills
+            </p>
+            <p>
+              <span className="font-black">THE BIG IDEA</span>
+            </p>
+            <p>
+              This game is about practicing careful looking so you can find the
+              object I&apos;m thinking of.
+            </p>
+          </div>
+          <div className="mt-4">
+            <p className="font-bold">INSTRUCTIONS</p>
+            <ol className="list-decimal list-inside">
+              <li>Say THE BIG IDEA.</li>
+              <li>
+                Gather students in a circle. Say, &quot;Let&apos;s make sure our
+                Focus Binoculars are working before we play. See if you can
+                catch what I do.&quot; Make a small movement with your face
+                (e.g., wink one eye, blink twice, or wiggle your nose).
+              </li>
+              <li>
+                Say, &quot;Now let&apos;s use our Focus Binoculars to see if you
+                can guess what object in the room I&apos;m thinking about. I spy
+                with my little eyes something that is _____ (e.g., choose a
+                color).&quot;
+              </li>
+              <li>
+                Students point their Focus Binoculars at their best guess. Ask
+                them what they are focusing on, and the first person who guesses
+                right gets to pick the next object!
+              </li>
+            </ol>
+          </div>
+          <div className="mt-4">
+            <p className="font-bold">
+              MUST DO: Must require students to ignore distractions/irrelevant
+              information.
+            </p>
+            <p className="font-bold">
+              CAN ADAPT: Look for more complicated objects.
+            </p>
+          </div>
+          <p className="mt-4">
+            Let&apos;s practice our Focus Power with the I Spy game!
+          </p>
           <p>
             Remember to use your Focus Binoculars to look carefully at the
             images.
           </p>
-          <PlayGameModal>
+          <GameCanvas things={images.map(image => ({ imageUrl: image }))}>
             <button
               onClick={startGame}
-              className="mt-2 w-full rounded-lg bg-green-500 p-2 text-white hover:bg-green-600"
+              className="mt-2 w-full font-black rounded-lg text-xl bg-[#7FB2DD] p-2 text-white hover:bg-[#378cd2]"
             >
               Start Game
             </button>
-          </PlayGameModal>
+          </GameCanvas>
         </div>
       )}
 
@@ -96,6 +144,7 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
           </div>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {images.map((imageUrl, index) => (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={index}
                 src={imageUrl}
@@ -131,7 +180,6 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
   )
 }
 
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -139,29 +187,78 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { IconClose } from '../ui/icons'
 
-export default function PlayGameModal({
-  children
+interface Thing {
+  imageUrl: string
+}
+
+export default function GameCanvas({
+  children,
+  things
 }: {
   children: React.ReactNode
+  things: Thing[]
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  const thingPositions = useMemo(() => {
+    return things.map(() => ({
+      top: `${Math.random() * 80 + 10}%`, // 10% to 90%
+      left: `${Math.random() * 80 + 10}%`
+    }))
+  }, [things])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    })
+  }, [])
+
+  const maskStyle = {
+    mask: `url('/binocular-image.png') no-repeat,
+           linear-gradient(#000 0 0)`,
+    WebkitMask: `url('/binocular-image.png') no-repeat,
+                 linear-gradient(#000 0 0)`,
+    maskComposite: 'exclude',
+    WebkitMaskComposite: 'exclude',
+    maskPosition: `${mousePos.x - 150}px ${mousePos.y - 50}px, center`,
+    WebkitMaskPosition: `${mousePos.x - 150}px ${mousePos.y - 50}px, center`
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] sm:h-full">
-        <DialogHeader>
-          <DialogTitle>iSpy</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-lg text-center mb-4">
-            This is an almost full-screen dialog.
-          </p>
-          <p className="text-sm text-muted-foreground text-center">
-            You can add any content you want here.
-          </p>
+      <DialogContent className="p-0 border-0 sm:max-w-[90vw] sm:max-h-[90vh] sm:h-full">
+        <div
+          ref={canvasRef}
+          className="relative size-full overflow-hidden bg-zinc-50 dark:bg-zinc-950"
+          onMouseMove={handleMouseMove}
+        >
+          {things.map((thing, index) => (
+            <div
+              key={index}
+              className="absolute"
+              style={{
+                top: thingPositions[index].top,
+                left: thingPositions[index].left,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              <img
+                src={thing.imageUrl}
+                alt={`Item ${index + 1}`}
+                className="size-32 lg:size-64 object-contain"
+              />
+            </div>
+          ))}
+          <div
+            className="absolute inset-0 bg-black/85 pointer-events-none backdrop-blur-sm"
+            style={maskStyle}
+          />
         </div>
       </DialogContent>
     </Dialog>
