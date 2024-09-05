@@ -37,6 +37,7 @@ import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
 import { ISpyGame } from '@/components/activities/i-spy-game'
 import { ISpyGame2 } from '@/components/activities/i-spy-game-2'
+import { ISpyGame3 } from '@/components/activities/i-spy-game-3'
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
   'use server'
@@ -257,7 +258,7 @@ GPT: "SEL programs are crucial for child development as they enhance emotional w
 
           console.log({ object })
 
-          return <ISpyGame2 props={{ items: [object] }} />
+          return <ISpyGame3 props={{ items: [object] }} />
         }
       },
       listStocks: {

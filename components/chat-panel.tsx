@@ -37,8 +37,8 @@ export function ChatPanel({
   const exampleMessages = [
     {
       heading: '',
-      subheading: 'What are some effective SEL activities in a classroom setting?',
-      message: 'What are some effective SEL activities in a classroom setting?'
+      subheading: 'Show me how to facilitate a self-management activity.',
+      message: 'Show me how to facilitate a self-management activity.'
     },
     {
       heading: '',
@@ -47,8 +47,10 @@ export function ChatPanel({
     },
     {
       heading: '',
-      subheading: 'What guidelines exist for developing SEL tools in a new culture?',
-      message: 'What guidelines exist for developing SEL tools in a new culture?'
+      subheading:
+        'What guidelines exist for developing SEL tools in a new culture?',
+      message:
+        'What guidelines exist for developing SEL tools in a new culture?'
     },
     {
       heading: '',

@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useActions, useUIState } from 'ai/rsc'
-import { IconUser, IconOpenAI } from '@/components/ui/icons'
-import { cn } from '@/lib/utils'
 
+import { cn } from '@/lib/utils'
 import type { AI } from '@/lib/chat/actions'
 
 const imageUrl =
