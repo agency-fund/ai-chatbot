@@ -35,10 +35,16 @@ export function ChatPanel({
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
 
   const exampleMessages = [
+    // {
+    //   heading: '',
+    //   subheading: 'Show me how to facilitate a self-management activity.', // TODO: change to attention. "How can i increase kids attention"
+    //   message: 'Show me how to facilitate a self-management activity.'
+    // },
+
     {
       heading: '',
-      subheading: 'Show me how to facilitate a self-management activity.',
-      message: 'Show me how to facilitate a self-management activity.'
+      subheading: 'How can I increase kids attention?', // TODO: change to attention. "How can i increase kids attention"
+      message: 'How can I increase kids attention?'
     },
     {
       heading: '',

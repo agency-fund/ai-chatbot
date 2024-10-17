@@ -2,29 +2,22 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { useActions, useUIState } from 'ai/rsc'
+import { useActions } from 'ai/rsc'
+import { toast } from 'sonner'
 
-import { cn } from '@/lib/utils'
-import type { AI } from '@/lib/chat/actions'
+const TOAST_DURATION = 10_000
 
-interface ISpyProps {
-  items: string[]
-}
-
-export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
+export function ISpyGame3({ item }: { item: string }) {
   const [images, setImages] = useState<string[]>([])
   const [currentItem, setCurrentItem] = useState('')
-  const [foundItems, setFoundItems] = useState<string[]>([])
-  const [message, setMessage] = useState('')
+  const [foundItem, setFoundItem] = useState(false)
   const [gamePhase, setGamePhase] = useState('intro')
-  const [, setMessages] = useUIState<typeof AI>()
-  const { submitUserMessage } = useActions()
 
   useEffect(() => {
-    if (gamePhase === 'play' && foundItems.length === items.length) {
+    if (gamePhase === 'play' && foundItem) {
       setGamePhase('complete')
     }
-  }, [foundItems, gamePhase, items.length])
+  }, [foundItem, gamePhase])
 
   const startGame = async () => {
     try {
@@ -33,38 +26,69 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          item
+        })
       })
       const data = await response.json()
       console.log({ data })
-      const imageUrls = data.processed_images.map(
+      const imageUrls = data.downloaded_images.map(
         (image: string) => `http://localhost:8000/images/download/${image}`
       )
+
+      const responseForHint = await fetch(
+        'http://localhost:8000/images/first-hint',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            item
+          })
+        }
+      )
+      const dataForHint = await responseForHint.json()
+      const hint = dataForHint.hint
+
       setImages(imageUrls)
       // setGamePhase('play')
-      setCurrentItem(getRandomItem())
+      toast.success(`Lets play. The first hint is ${hint}.`, {
+        duration: TOAST_DURATION
+      })
+      setFoundItem(true)
     } catch (error) {
       console.error('Failed to fetch images:', error)
-      setMessage('Failed to start the game. Please try again.')
+      toast.error('Failed to start the game. Please try again.')
     }
   }
 
-  const getRandomItem = () => {
-    const remainingItems = items.filter(item => !foundItems.includes(item))
-    return remainingItems[Math.floor(Math.random() * remainingItems.length)]
-  }
+  const handleImageClick = async (imageUrl: string) => {
+    console.log({ imageUrl })
+    const parts = imageUrl.split('/')
+    const base64ImageUUID = parts.slice(parts.length - 1)[0]
+    console.log({ base64ImageUUID })
 
-  const handleImageClick = (index: number) => {
-    const isCorrect = Math.random() < 0.5
-
-    if (isCorrect) {
-      setFoundItems([...foundItems, currentItem])
-      setMessage(`Great job! You found the ${currentItem}!`)
-      if (foundItems.length + 1 < items.length) {
-        setCurrentItem(getRandomItem())
-      }
+    const response = await fetch('http://localhost:8000/images/guess', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        base64Image: base64ImageUUID,
+        correctImageText: item
+      })
+    })
+    const data = await response.json()
+    if (data.success) {
+      toast.success(data.message, {
+        duration: TOAST_DURATION
+      })
+      setGamePhase('complete')
     } else {
-      setMessage(`Oops! That's not the ${currentItem}. Keep looking!`)
+      toast.error(data.message, {
+        duration: TOAST_DURATION
+      })
     }
   }
 
@@ -72,7 +96,7 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
     <div className="rounded-xl border border-[#547221] bg-[#B5D97A] p-4">
       <div className="text-white uppercase font-black text-3xl">I Spy</div>
 
-      {gamePhase === 'intro' && (
+      {(gamePhase === 'intro' || gamePhase === 'play') && (
         <div className="mt-4">
           <div className="-mx-2 bg-[#547221] text-white p-4 rounded-lg">
             <p>
@@ -126,7 +150,10 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
             Remember to use your Focus Binoculars to look carefully at the
             images.
           </p>
-          <GameCanvas things={images.map(image => ({ imageUrl: image }))}>
+          <GameCanvas
+            things={images.map(image => ({ imageUrl: image }))}
+            onImageClick={handleImageClick}
+          >
             <button
               onClick={startGame}
               className="mt-2 w-full font-black rounded-lg text-xl bg-[#7FB2DD] p-2 text-white hover:bg-[#378cd2]"
@@ -137,43 +164,11 @@ export function ISpyGame3({ props: { items } }: { props: ISpyProps }) {
         </div>
       )}
 
-      {(gamePhase === 'play' || gamePhase === 'complete') && (
-        <>
-          <div className="mt-4 text-base">
-            Find the {currentItem} in the images:
-          </div>
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            {images.map((imageUrl, index) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={index}
-                src={imageUrl}
-                alt={`Object ${index + 1}`}
-                className="w-full h-auto cursor-pointer"
-                onClick={() => handleImageClick(index)}
-              />
-            ))}
-          </div>
-          <div className="mt-2">Found items: {foundItems.join(', ')}</div>
-        </>
-      )}
-
       {gamePhase === 'complete' && (
         <div className="mt-4">
           <p>Great job! You found all the items in this game.</p>
           <p>How did you use your Focus Power during the game?</p>
           <p>When else might you use your Focus Power during the day?</p>
-        </div>
-      )}
-
-      {message && (
-        <div
-          className={cn(
-            'mt-4 text-center',
-            message.includes('Great job') ? 'text-green-500' : 'text-red-500'
-          )}
-        >
-          {message}
         </div>
       )}
     </div>
@@ -194,10 +189,12 @@ interface Thing {
 
 export default function GameCanvas({
   children,
-  things
+  things,
+  onImageClick
 }: {
   children: React.ReactNode
   things: Thing[]
+  onImageClick: (imageUrl: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -225,9 +222,52 @@ export default function GameCanvas({
                  linear-gradient(#000 0 0)`,
     maskComposite: 'exclude',
     WebkitMaskComposite: 'exclude',
-    maskPosition: `${mousePos.x - 150}px ${mousePos.y - 50}px, center`,
-    WebkitMaskPosition: `${mousePos.x - 150}px ${mousePos.y - 50}px, center`
+    maskPosition: `${mousePos.x - 300}px ${mousePos.y - 150}px, center`,
+    WebkitMaskPosition: `${mousePos.x - 300}px ${mousePos.y - 150}px, center`
   }
+
+  const handleCanvasClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      // Check if the click is within the binocular area
+      const binocularCenterX = mousePos.x
+      const binocularCenterY = mousePos.y
+      const binocularRadius = 100 // Adjust this value based on your binocular image size
+
+      if (
+        Math.sqrt(
+          Math.pow(x - binocularCenterX, 2) + Math.pow(y - binocularCenterY, 2)
+        ) <= binocularRadius
+      ) {
+        // Find the closest image to the click position
+        let closestImage: Thing | null = null
+        let closestDistance = Infinity
+
+        things.forEach((thing, index) => {
+          const thingX =
+            (parseFloat(thingPositions[index].left) * rect.width) / 100
+          const thingY =
+            (parseFloat(thingPositions[index].top) * rect.height) / 100
+          const distance = Math.sqrt(
+            Math.pow(x - thingX, 2) + Math.pow(y - thingY, 2)
+          )
+
+          if (distance < closestDistance) {
+            closestDistance = distance
+            closestImage = thing
+          }
+        })
+
+        if (closestImage) {
+          onImageClick(closestImage.imageUrl)
+        }
+      }
+    },
+    [mousePos, things, thingPositions, onImageClick]
+  )
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -237,6 +277,7 @@ export default function GameCanvas({
           ref={canvasRef}
           className="relative size-full overflow-hidden bg-zinc-50 dark:bg-zinc-950"
           onMouseMove={handleMouseMove}
+          onClick={handleCanvasClick}
         >
           {things.map((thing, index) => (
             <div
@@ -256,7 +297,7 @@ export default function GameCanvas({
             </div>
           ))}
           <div
-            className="absolute inset-0 bg-black/85 pointer-events-none backdrop-blur-sm"
+            className="absolute inset-0 bg-black/85 pointer-events-none backdrop-blur-lg"
             style={maskStyle}
           />
         </div>

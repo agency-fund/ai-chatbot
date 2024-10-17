@@ -202,12 +202,8 @@ GPT: "SEL programs are crucial for child development as they enhance emotional w
     - "[SEL Activity: Mindfulness Exercise]" means that an interface of a mindfulness exercise activity is shown to the user.
     - "[User has completed the empathy quiz]" means that the user has completed the empathy quiz in the UI.
 
-    If the user requests an activity to demonstrate the SEL concept of self-management, call \`start_ispy_game\` to start the self-management activity. Be sure to ask them what objects they want the students to guess.
+    If the user requests an activity to demonstrate the SEL concept of self-management or how to increase kids attention, call \`start_ispy_game\` to start the self-management SEL activity known as iSpy. Be sure to ask them what objects they want the students to guess.
 
-    If the user requests an SEL activity, call \`show_sel_activity_ui\` to show the activity UI.
-    If the user wants SEL resources, call \`show_sel_resources\` to display the resources.
-    If you want to show SEL topics, call \`list_sel_topics\`.
-    If you want to show SEL events, call \`get_sel_events\`.
     If the user requests something outside of SEL or an impossible task, respond that you are focused on SEL support and cannot do that.
 
     Besides that, you can also chat with users and provide information or guidance on SEL topics if needed.`,
@@ -256,9 +252,7 @@ GPT: "SEL programs are crucial for child development as they enhance emotional w
             </BotCard>
           )
 
-          console.log({ object })
-
-          return <ISpyGame3 props={{ items: [object] }} />
+          return <ISpyGame3 item={object} />
         }
       },
       listStocks: {
